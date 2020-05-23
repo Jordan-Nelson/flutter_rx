@@ -25,23 +25,26 @@ class Store<State> {
     this.effects,
   }) {
     subject.add(ititialValue);
-    actionsSubject.listen((StoreAction action) {
+    actionStream.listen((StoreAction action) {
       State newState = this.reducer(subject.value, action);
       subject.add(newState);
+      effectsActionStream.add(action);
     });
     effects.forEach((StoreEffect<State> effect) {
-      return effect(this.actionsSubject, store: this).listen((action) {
+      return effect(this.effectsActionStream, store: this).listen((action) {
         if (action is StoreAction) {
           this.dispatch(action);
         }
       });
     });
-    // effects().map((streamFn) => streamFn(this.actionsSubject).listen((event) {}));
   }
 
   Reducer<State> reducer;
   List<StoreEffect<State>> effects;
-  BehaviorSubject<StoreAction> actionsSubject = BehaviorSubject<StoreAction>();
+  BehaviorSubject<StoreAction> actionStream = BehaviorSubject<StoreAction>();
+  BehaviorSubject<StoreAction> effectsActionStream =
+      BehaviorSubject<StoreAction>();
+
   BehaviorSubject<State> subject = BehaviorSubject<State>();
   Stream<State> get state => this.subject;
 
@@ -50,7 +53,7 @@ class Store<State> {
   }
 
   dispatch(StoreAction action) {
-    actionsSubject.add(action);
+    actionStream.add(action);
   }
 }
 
