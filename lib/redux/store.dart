@@ -1,6 +1,28 @@
 import 'dart:async';
-
+import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
+
+class StoreProvider<T> extends InheritedWidget {
+  const StoreProvider({
+    Key key,
+    @required store,
+    @required Widget child,
+  })  : assert(store != null),
+        assert(child != null),
+        _store = store,
+        super(key: key, child: child);
+
+  final Store<T> _store;
+
+  static Store<T> of<T>(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<StoreProvider<T>>()
+        ._store;
+  }
+
+  @override
+  bool updateShouldNotify(_) => false;
+}
 
 class StoreAction {}
 
