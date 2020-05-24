@@ -59,7 +59,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FlutterRx Demo'),
+        title: Text('FlutterRx Counter Demo'),
       ),
       body: Center(
         child: Column(
