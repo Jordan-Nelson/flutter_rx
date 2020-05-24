@@ -76,8 +76,8 @@ class Store<State> {
   BehaviorSubject<State> subject = BehaviorSubject<State>();
   Stream<State> get state => this.subject;
 
-  Stream<K> select<K>(K Function(State state) mapFn) {
-    return this.state.map(mapFn).distinct();
+  Stream<K> select<K>(Stream<K> Function(Stream<State> state) mapFn) {
+    return mapFn(this.state).distinct();
   }
 
   dispatch(StoreAction action) {

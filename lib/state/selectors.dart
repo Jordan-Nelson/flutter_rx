@@ -2,36 +2,36 @@ import 'package:my_app/redux/store.dart';
 
 import 'appState.dart';
 
-Stream<int> selectCounter(Store<AppState> store) {
-  return store.select((state) => state.counter);
+Stream<int> selectCounterSimple(Stream<AppState> state) {
+  return state.map((state) => state.counter);
 }
 
-Stream<int> selectCounterAlt(Store<AppState> store) {
-  return createSelector(store.state, (AppState state) => state.counter);
+Stream<int> selectCounter(Stream<AppState> state) {
+  return createSelector(state, (AppState state) => state.counter);
 }
 
-Stream<int> selectCounter2(Store<AppState> store) {
+Stream<int> selectCounter2(Stream<AppState> state) {
   return createSelector2(
-    selectCounter(store),
-    selectCounter(store),
+    selectCounter(state),
+    selectCounter(state),
     (int counter1, int counter2) {
-      return counter1;
+      return counter1 + counter2;
     },
   );
 }
 
-Stream<int> selectCounter10(Store<AppState> store) {
+Stream<int> selectCounter10(Stream<AppState> state) {
   return createSelector10(
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
-    selectCounter(store),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
+    selectCounter(state),
     (
       int c1,
       int c2,

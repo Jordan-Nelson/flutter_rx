@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
             //   },
             // ),
             StreamBuilder(
-              stream: selectCounter10(StoreProvider.of<AppState>(context)),
+              stream: StoreProvider.of<AppState>(context).select(selectCounter),
               builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                 return Text(
                   snapshot.hasData ? snapshot.data.toString() : '',

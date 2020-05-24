@@ -22,7 +22,7 @@ StoreEffect<AppState> writeLocalStorageEffect = (
 }) {
   return actions
       .whereType<WriteLocalStorageCounterAction>()
-      .withLatestFrom(selectCounter(store), (action, int value) => value)
+      .withLatestFrom(store.select(selectCounter), (action, int value) => value)
       .switchMap((value) => Stream.fromFuture(mockLocalStorage.write(value)))
       .map((value) => WriteLocalStorageCounterSuccessAction())
       .handleError((_) => WriteLocalStorageCounterFailAction());
