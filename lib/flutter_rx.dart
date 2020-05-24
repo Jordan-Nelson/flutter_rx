@@ -43,12 +43,12 @@ typedef StoreEffect<State> = Stream<StoreAction>
 
 class Store<State> {
   Store({
-    @required State ititialValue,
+    @required State initialState,
     this.reducer,
     this.effects,
   }) {
-    assert(ititialValue != null);
-    subject.add(ititialValue);
+    assert(initialState != null);
+    subject.add(initialState);
     if (this.reducer != null) {
       actionStream.listen((StoreAction action) {
         State newState = this.reducer(subject.value, action);

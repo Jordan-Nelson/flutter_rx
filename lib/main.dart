@@ -8,7 +8,7 @@ import 'state/effects.dart';
 import 'state/reducer.dart';
 
 Store<AppState> store = Store(
-  ititialValue: AppState(),
+  initialState: AppState(),
   reducer: reducer,
   effects: storeEffects,
 );
