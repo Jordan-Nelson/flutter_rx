@@ -26,8 +26,6 @@ class StoreProvider<T> extends InheritedWidget {
 
 class StoreAction {}
 
-// class StoreAction extends Type {}
-
 /// /// A [Reducer] function that only accepts a [StoreAction] of a specific type
 typedef ActionReducer<State, Action extends StoreAction> = State Function(
   State state,
@@ -39,10 +37,6 @@ typedef Reducer<State> = State Function(
   State state,
   StoreAction action,
 );
-// typedef Reducer<State> = State Function(
-//   State state,
-//   dynamic action,
-// );
 
 typedef StoreEffect<State> = Stream<StoreAction>
     Function(BehaviorSubject<StoreAction>, {Store<State> store});
@@ -88,6 +82,30 @@ class Store<State> {
 
   dispatch(StoreAction action) {
     actionStream.add(action);
+  }
+}
+
+Reducer<State> createReducer<State, Action extends StoreAction>(
+  Iterable<On<State, Action>> ons,
+) {
+  return (State state, StoreAction action) {
+    for (final onAction in ons) {
+      state = onAction(state, action);
+    }
+    return state;
+  };
+}
+
+class On<State, Action extends StoreAction> {
+  final ActionReducer<State, Action> reducer;
+
+  On(this.reducer);
+
+  State call(State state, dynamic action) {
+    if (action is Action) {
+      return reducer(state, action);
+    }
+    return state;
   }
 }
 
@@ -244,28 +262,4 @@ Stream<R> createSelector10<A, B, C, D, E, F, G, H, I, J, R>(
         fn,
       )
       .distinct();
-}
-
-Reducer<State> createReducer<State, Action extends StoreAction>(
-  Iterable<On<State, Action>> ons,
-) {
-  return (State state, StoreAction action) {
-    for (final onAction in ons) {
-      state = onAction(state, action);
-    }
-    return state;
-  };
-}
-
-class On<State, Action extends StoreAction> {
-  final ActionReducer<State, Action> reducer;
-
-  On(this.reducer);
-
-  State call(State state, dynamic action) {
-    if (action is Action) {
-      return reducer(state, action);
-    }
-    return state;
-  }
 }
