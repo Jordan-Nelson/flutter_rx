@@ -38,8 +38,10 @@ typedef Reducer<State> = State Function(
   StoreAction action,
 );
 
-typedef StoreEffect<State> = Stream<StoreAction>
-    Function(BehaviorSubject<StoreAction>, {Store<State> store});
+typedef Effect<State> = Stream<StoreAction> Function(
+  BehaviorSubject<StoreAction>,
+  Store<State> store,
+);
 
 class Store<State> {
   Store({
@@ -57,8 +59,8 @@ class Store<State> {
       });
     }
     if (this.effects != null) {
-      effects.forEach((StoreEffect<State> effect) {
-        return effect(this.effectsActionStream, store: this).listen((action) {
+      effects.forEach((Effect<State> effect) {
+        return effect(this.effectsActionStream, this).listen((action) {
           if (action is StoreAction) {
             this.dispatch(action);
           }
@@ -68,7 +70,7 @@ class Store<State> {
   }
 
   Reducer<State> reducer;
-  List<StoreEffect<State>> effects;
+  List<Effect<State>> effects;
   BehaviorSubject<StoreAction> actionStream = BehaviorSubject<StoreAction>();
   BehaviorSubject<StoreAction> effectsActionStream =
       BehaviorSubject<StoreAction>();
