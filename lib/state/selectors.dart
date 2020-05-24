@@ -1,4 +1,4 @@
-import 'package:my_app/redux/store.dart';
+import 'package:flutter_rx/flutter_rx.dart';
 
 import 'appState.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/redux/store.dart';
-import 'package:my_app/state/selectors.dart';
+import 'package:flutter_rx/flutter_rx.dart';
+import 'package:flutter_rx/state/selectors.dart';
 
 import 'state/actions.dart';
 import 'state/appState.dart';

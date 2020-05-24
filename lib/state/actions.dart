@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:my_app/redux/store.dart';
+import 'package:flutter_rx/flutter_rx.dart';
 
 class IncrementCounterAction extends StoreAction {}
 

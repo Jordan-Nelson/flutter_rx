@@ -1,4 +1,4 @@
-import 'package:my_app/redux/store.dart';
+import 'package:flutter_rx/flutter_rx.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../mock_local_storage.dart';
