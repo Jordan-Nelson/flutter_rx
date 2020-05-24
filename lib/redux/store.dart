@@ -26,16 +26,23 @@ class StoreProvider<T> extends InheritedWidget {
 
 class StoreAction {}
 
-/// A function that takes an `StoreAction` and a `State`, and returns a `State`.
+// class StoreAction extends Type {}
+
+/// /// A [Reducer] function that only accepts a [StoreAction] of a specific type
 typedef ActionReducer<State, Action extends StoreAction> = State Function(
   State state,
   Action action,
 );
 
+/// A function that takes an [StoreAction] and a [State], and returns a [State].
 typedef Reducer<State> = State Function(
   State state,
   StoreAction action,
 );
+// typedef Reducer<State> = State Function(
+//   State state,
+//   dynamic action,
+// );
 
 typedef StoreEffect<State> = Stream<StoreAction>
     Function(BehaviorSubject<StoreAction>, {Store<State> store});
@@ -239,22 +246,26 @@ Stream<R> createSelector10<A, B, C, D, E, F, G, H, I, J, R>(
       .distinct();
 }
 
-// Map<String, ActionReducer<State, StoreAction>> _actionMap =
-//     Map<String, ActionReducer<State, StoreAction>>();
+Reducer<State> createReducer<State, Action extends StoreAction>(
+  Iterable<On<State, Action>> ons,
+) {
+  return (State state, StoreAction action) {
+    for (final onAction in ons) {
+      state = onAction(state, action);
+    }
+    return state;
+  };
+}
 
-// onAction(
-//   StoreAction action,
-//   ActionReducer<State, StoreAction> actionHandler,
-// ) {
-//   _actionMap.update(
-//     action.type,
-//     (value) => actionHandler,
-//     ifAbsent: () => actionHandler,
-//   );
-// }
+class On<State, Action extends StoreAction> {
+  final ActionReducer<State, Action> reducer;
 
-// ActionReducer<State, StoreAction> handler = _actionMap[action.type];
-// if (handler != null) {
-//   this._state = handler(this._state, action);
-//   controller.add(_state);
-// }
+  On(this.reducer);
+
+  State call(State state, dynamic action) {
+    if (action is Action) {
+      return reducer(state, action);
+    }
+    return state;
+  }
+}
