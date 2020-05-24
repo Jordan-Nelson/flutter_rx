@@ -38,7 +38,7 @@ typedef Reducer<State> = State Function(
   StoreAction action,
 );
 
-typedef Effect<State> = Stream<StoreAction> Function(
+typedef Effect<State> = Stream<dynamic> Function(
   BehaviorSubject<StoreAction>,
   Store<State> store,
 );
