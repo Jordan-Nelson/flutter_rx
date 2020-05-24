@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rx/flutter_rx.dart';
 
 // An action to increment the counter by 1
@@ -27,12 +28,19 @@ class ReadLocalStorageCounterAction extends StoreAction {}
 
 // An action to write the counter value to local storage
 class WriteLocalStorageCounterAction extends StoreAction {
-  WriteLocalStorageCounterAction({@required this.value});
-  int value;
+  WriteLocalStorageCounterAction({this.context});
+  BuildContext context;
 }
 
 // An action to indicate the counter has been written to local storage
-class WriteLocalStorageCounterSuccessAction extends StoreAction {}
+class WriteLocalStorageCounterSuccessAction extends StoreAction {
+  WriteLocalStorageCounterSuccessAction({
+    @required this.context,
+    @required this.value,
+  });
+  BuildContext context;
+  int value;
+}
 
 // An action to indicate the counter has failed to write to local storage
 class WriteLocalStorageCounterFailAction extends StoreAction {}
