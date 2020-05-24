@@ -17,7 +17,7 @@ class StoreProvider<T> extends InheritedWidget {
   static Store<T> of<T>(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<StoreProvider<T>>()
-        ._store;
+        ?._store;
   }
 
   @override
