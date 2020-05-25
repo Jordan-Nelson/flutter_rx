@@ -69,11 +69,11 @@ class Store<State> {
     this.effects,
   }) {
     assert(initialState != null);
-    subject.add(initialState);
+    state.add(initialState);
     if (this.reducer != null) {
       actionStream.listen((StoreAction action) {
-        State newState = this.reducer(subject.value, action);
-        subject.add(newState);
+        State newState = this.reducer(state.value, action);
+        state.add(newState);
         effectsActionStream.add(action);
       });
     }
@@ -94,8 +94,7 @@ class Store<State> {
   BehaviorSubject<StoreAction> effectsActionStream =
       BehaviorSubject<StoreAction>();
 
-  BehaviorSubject<State> subject = BehaviorSubject<State>();
-  Stream<State> get state => this.subject;
+  BehaviorSubject<State> state = BehaviorSubject<State>();
 
   Stream<K> select<K>(Stream<K> Function(Stream<State> state) mapFn) {
     return mapFn(this.state).distinct();
