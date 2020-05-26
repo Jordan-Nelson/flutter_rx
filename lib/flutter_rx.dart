@@ -117,8 +117,8 @@ class Store<State> {
 ///         (counter, action) => counter - 1,
 ///       ),
 ///     ]);
-Reducer<State> createReducer<State, Action extends StoreAction>(
-  Iterable<On<State, Action>> ons,
+Reducer<State> createReducer<State>(
+  Iterable<On<State, StoreAction>> ons,
 ) {
   return (State state, StoreAction action) {
     for (final onAction in ons) {
