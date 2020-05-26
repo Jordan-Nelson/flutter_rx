@@ -28,6 +28,30 @@ class StoreProvider<T> extends InheritedWidget {
   bool updateShouldNotify(_) => false;
 }
 
+/// Build a widget based on the state of the [Store].
+///
+/// This widget is simply a wrapper around a [StreamBuilder].
+/// The recommended approach is to use [StreamBuilder] directly,
+/// but this widget abstracts away the use of stream for those
+/// that prefer that approach
+///
+/// This widget is helpful in migrating from flutter_redux as it
+/// has a similar interface to StoreConnector from flutter_redux
+class StoreConnector<State, T> extends StatelessWidget {
+  final Stream<T> Function(Stream<State>) selector;
+  final Widget Function(BuildContext, T) builder;
+  StoreConnector({@required this.selector, @required this.builder});
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<T>(
+      stream: StoreProvider.of<State>(context).select(selector),
+      builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
+        return builder(context, snapshot.data);
+      },
+    );
+  }
+}
+
 /// A base class for all Actions to extend.
 /// This allows for type safety when dispatching actions
 /// or handling actions in reducers or effects.
