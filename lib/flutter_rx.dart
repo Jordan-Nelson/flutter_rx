@@ -178,218 +178,226 @@ class On<State, Action extends StoreAction> {
   }
 }
 
-/// A utility for mapping an incoming stream to a new stream. The new
-/// stream will only emit distinct values.
+typedef Selector<State, AppState> = Stream<State> Function(Stream<AppState>);
+
+/// A utility for creating a new [Selector] from a map function.
+/// The selector will only emit distinct values.
 ///
 /// ### Example
-///     Stream<int> selectCounter(Stream<AppState> state) {
-///       return createSelector(state, (AppState state) => state.counter);
-///     }
-Stream<R> createSelector<S, R>(
-  Stream<S> state,
-  R Function(S) fn,
+///     Selector<int, AppState> selectCounter = createSelector(
+///       (AppState state) => state.counter,
+///     );
+Selector<R, AppState> createSelector<AppState, R>(
+  R Function(AppState) mapFn,
 ) {
-  return state.map(fn).distinct();
+  return (stream) => stream.map(mapFn).distinct();
 }
 
-/// A utility for mapping two incoming streams to a new stream. The new
-/// stream will only emit distinct values.
+/// A utility for creating a new [Selector] from an existing
+/// selector and a map function. The selector will only emit
+/// distinct values.
 ///
 /// ### Example
-///     Stream<int> mySelector(Stream<AppState> state) {
-///       return createSelector2(
-///         mySelector1(state),
-///         mySelector2(state),
-///         (int a, int b) {
-///           return a + b;
-///         },
-///       );
-///     }
-Stream<R> createSelector2<A, B, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  R Function(A, B) fn,
+///     Selector<int, AppState> selectCounterSqared = createSelector1(
+///       selectCounter,
+///       (int value) => value * value,
+///     );
+Selector<R, AppState> createSelector1<AppState, S1, R>(
+  Selector<S1, AppState> selector1,
+  R Function(S1) mapFn,
 ) {
-  return state1.withLatestFrom(state2, fn).distinct();
+  return (stream) => selector1(stream).map(mapFn).distinct();
 }
 
-/// A utility for mapping three incoming streams to a new stream. The new
-/// stream will only emit distinct values.
+/// A utility for composing two [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
 ///
 /// ### Example
-///     Stream<int> mySelector(Stream<AppState> state) {
-///       return createSelector3(
-///         mySelector1(state),
-///         mySelector2(state),
-///         mySelector3(state),
-///         (int a, int b, int c) {
-///           return a + b + c;
-///         },
-///       );
-///     }
-Stream<R> createSelector3<A, B, C, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  R Function(A, B, C) fn,
+///     Selector<int, AppState> mySelector = createSelector2(
+///       mySelector1,
+///       mySelector2,
+///       (int a, int b) => a + b,
+///     );
+Selector<R, AppState> createSelector2<AppState, S1, S2, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  R Function(S1, S2) mapFn,
 ) {
-  return state1.withLatestFrom2(state2, state3, fn).distinct();
-}
-
-/// A utility for mapping four incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-///
-/// ### Example
-///     Stream<int> mySelector(Stream<AppState> state) {
-///       return createSelector3(
-///         mySelector1(state),
-///         mySelector2(state),
-///         mySelector3(state),
-///         mySelector4(state),
-///         (int a, int b, int c, int d) {
-///           return a + b + c + d;
-///         },
-///       );
-///     }
-Stream<R> createSelector4<A, B, C, D, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  R Function(A, B, C, D) fn,
-) {
-  return state1.withLatestFrom3(state2, state3, state4, fn).distinct();
-}
-
-/// A utility for mapping five incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector5<A, B, C, D, E, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  R Function(A, B, C, D, E) fn,
-) {
-  return state1.withLatestFrom4(state2, state3, state4, state5, fn).distinct();
-}
-
-/// A utility for mapping six incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector6<A, B, C, D, E, F, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  Stream<F> state6,
-  R Function(A, B, C, D, E, F) fn,
-) {
-  return state1
-      .withLatestFrom5(state2, state3, state4, state5, state6, fn)
+  return (stream) => selector1(stream)
+      .withLatestFrom(
+        selector2(stream),
+        mapFn,
+      )
       .distinct();
 }
 
-/// A utility for mapping seven incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector7<A, B, C, D, E, F, G, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  Stream<F> state6,
-  Stream<G> state7,
-  R Function(A, B, C, D, E, F, G) fn,
+/// A utility for composing three [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+///
+/// ### Example
+///     Selector<int, AppState> mySelector = createSelector2(
+///       mySelector1,
+///       mySelector2,
+///       mySelector3,
+///       (int a, int b, int c) => a + b + c,
+///     );
+Selector<R, AppState> createSelector3<AppState, S1, S2, S3, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  R Function(S1, S2, S3) mapFn,
 ) {
-  return state1
-      .withLatestFrom6(state2, state3, state4, state5, state6, state7, fn)
+  return (stream) => selector1(stream)
+      .withLatestFrom2(
+        selector2(stream),
+        selector3(stream),
+        mapFn,
+      )
       .distinct();
 }
 
-/// A utility for mapping eight incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector8<A, B, C, D, E, F, G, H, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  Stream<F> state6,
-  Stream<G> state7,
-  Stream<H> state8,
-  R Function(A, B, C, D, E, F, G, H) fn,
+/// A utility for composing four [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState> createSelector4<AppState, S1, S2, S3, S4, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  R Function(S1, S2, S3, S4) mapFn,
 ) {
-  return state1
+  return (stream) => selector1(stream)
+      .withLatestFrom3(
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        mapFn,
+      )
+      .distinct();
+}
+
+/// A utility for composing five [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState> createSelector5<AppState, S1, S2, S3, S4, S5, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  Selector<S5, AppState> selector5,
+  R Function(S1, S2, S3, S4, S5) mapFn,
+) {
+  return (stream) => selector1(stream)
+      .withLatestFrom4(
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        selector5(stream),
+        mapFn,
+      )
+      .distinct();
+}
+
+/// A utility for composing six [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState> createSelector6<AppState, S1, S2, S3, S4, S5, S6, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  Selector<S5, AppState> selector5,
+  Selector<S6, AppState> selector6,
+  R Function(S1, S2, S3, S4, S5, S6) mapFn,
+) {
+  return (stream) => selector1(stream)
+      .withLatestFrom5(
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        selector5(stream),
+        selector6(stream),
+        mapFn,
+      )
+      .distinct();
+}
+
+/// A utility for composing seven [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState> createSelector7<AppState, S1, S2, S3, S4, S5, S6, S7, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  Selector<S5, AppState> selector5,
+  Selector<S6, AppState> selector6,
+  Selector<S7, AppState> selector7,
+  R Function(S1, S2, S3, S4, S5, S6, S7) mapFn,
+) {
+  return (stream) => selector1(stream)
+      .withLatestFrom6(
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        selector5(stream),
+        selector6(stream),
+        selector7(stream),
+        mapFn,
+      )
+      .distinct();
+}
+
+/// A utility for composing eight [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState>
+    createSelector8<AppState, S1, S2, S3, S4, S5, S6, S7, S8, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  Selector<S5, AppState> selector5,
+  Selector<S6, AppState> selector6,
+  Selector<S7, AppState> selector7,
+  Selector<S8, AppState> selector8,
+  R Function(S1, S2, S3, S4, S5, S6, S7, S8) mapFn,
+) {
+  return (stream) => selector1(stream)
       .withLatestFrom7(
-        state2,
-        state3,
-        state4,
-        state5,
-        state6,
-        state7,
-        state8,
-        fn,
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        selector5(stream),
+        selector6(stream),
+        selector7(stream),
+        selector8(stream),
+        mapFn,
       )
       .distinct();
 }
 
-/// A utility for mapping nine incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector9<A, B, C, D, E, F, G, H, I, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  Stream<F> state6,
-  Stream<G> state7,
-  Stream<H> state8,
-  Stream<I> state9,
-  R Function(A, B, C, D, E, F, G, H, I) fn,
+/// A utility for composing nine [Selector] functions together to
+/// create a new [Selector]. The selector will only emit distinct values.
+Selector<R, AppState>
+    createSelector9<AppState, S1, S2, S3, S4, S5, S6, S7, S8, S9, R>(
+  Selector<S1, AppState> selector1,
+  Selector<S2, AppState> selector2,
+  Selector<S3, AppState> selector3,
+  Selector<S4, AppState> selector4,
+  Selector<S5, AppState> selector5,
+  Selector<S6, AppState> selector6,
+  Selector<S7, AppState> selector7,
+  Selector<S8, AppState> selector8,
+  Selector<S9, AppState> selector9,
+  R Function(S1, S2, S3, S4, S5, S6, S7, S8, S9) mapFn,
 ) {
-  return state1
+  return (stream) => selector1(stream)
       .withLatestFrom8(
-        state2,
-        state3,
-        state4,
-        state5,
-        state6,
-        state7,
-        state8,
-        state9,
-        fn,
-      )
-      .distinct();
-}
-
-/// A utility for mapping ten incoming streams to a new stream. The new
-/// stream will only emit distinct values.
-Stream<R> createSelector10<A, B, C, D, E, F, G, H, I, J, R>(
-  Stream<A> state1,
-  Stream<B> state2,
-  Stream<C> state3,
-  Stream<D> state4,
-  Stream<E> state5,
-  Stream<F> state6,
-  Stream<G> state7,
-  Stream<H> state8,
-  Stream<I> state9,
-  Stream<J> state10,
-  R Function(A, B, C, D, E, F, G, H, I, J) fn,
-) {
-  return state1
-      .withLatestFrom9(
-        state2,
-        state3,
-        state4,
-        state5,
-        state6,
-        state7,
-        state8,
-        state9,
-        state10,
-        fn,
+        selector2(stream),
+        selector3(stream),
+        selector4(stream),
+        selector5(stream),
+        selector6(stream),
+        selector7(stream),
+        selector8(stream),
+        selector9(stream),
+        mapFn,
       )
       .distinct();
 }
