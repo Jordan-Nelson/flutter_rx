@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_rx/rx_stream_builder.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Provides a [Store] to all descendants of this Widget. This should
@@ -41,10 +42,12 @@ class StoreConnector<State, T> extends StatelessWidget {
   final Stream<T> Function(Stream<State>) selector;
   final Widget Function(BuildContext, T) builder;
   StoreConnector({@required this.selector, @required this.builder});
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<T>(
-      stream: StoreProvider.of<State>(context).select(selector),
+    Stream<T> stream = StoreProvider.of<State>(context).select(selector);
+    return RxStreamBuilder<T>(
+      stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
         return builder(context, snapshot.data);
       },
@@ -178,7 +181,9 @@ class On<State, Action extends StoreAction> {
   }
 }
 
-typedef Selector<State, AppState> = Stream<State> Function(Stream<AppState>);
+typedef Selector<R, AppState> = Stream<R> Function(Stream<AppState>);
+typedef BehaviorSubjectSelector<R, AppState> = BehaviorSubject<R> Function(
+    Stream<AppState>);
 
 /// A utility for creating a new [Selector] from a map function.
 /// The selector will only emit distinct values.
@@ -187,10 +192,18 @@ typedef Selector<State, AppState> = Stream<State> Function(Stream<AppState>);
 ///     Selector<int, AppState> selectCounter = createSelector(
 ///       (AppState state) => state.counter,
 ///     );
-Selector<R, AppState> createSelector<AppState, R>(
+BehaviorSubjectSelector<R, AppState> createSelector<R, AppState>(
   R Function(AppState) mapFn,
 ) {
-  return (stream) => stream.map(mapFn).distinct();
+  return (stream) {
+    Stream<R> newStream = stream.map(mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if (stream is BehaviorSubject) {
+      subject.add(mapFn((stream as BehaviorSubject).value));
+    }
+    subject.addStream(newStream);
+    return subject;
+  };
 }
 
 /// A utility for creating a new [Selector] from an existing
@@ -202,11 +215,20 @@ Selector<R, AppState> createSelector<AppState, R>(
 ///       selectCounter,
 ///       (int value) => value * value,
 ///     );
-Selector<R, AppState> createSelector1<AppState, S1, R>(
+BehaviorSubjectSelector<R, AppState> createSelector1<R, AppState, S1>(
   Selector<S1, AppState> selector1,
   R Function(S1) mapFn,
 ) {
-  return (stream) => selector1(stream).map(mapFn).distinct();
+  return (stream) {
+    Stream<S1> selectorStream = selector1(stream);
+    Stream<R> newStream = selectorStream.map(mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if (selectorStream is BehaviorSubject) {
+      subject.add(mapFn((selectorStream as BehaviorSubject).value));
+    }
+    subject.addStream(newStream);
+    return subject;
+  };
 }
 
 /// A utility for composing two [Selector] functions together to
@@ -218,17 +240,25 @@ Selector<R, AppState> createSelector1<AppState, S1, R>(
 ///       mySelector2,
 ///       (int a, int b) => a + b,
 ///     );
-Selector<R, AppState> createSelector2<AppState, S1, S2, R>(
+BehaviorSubjectSelector<R, AppState> createSelector2<R, AppState, S1, S2>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   R Function(S1, S2) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom(
-        selector2(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<R> mappedStream = Rx.combineLatest2(s1, s2, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2].every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing three [Selector] functions together to
@@ -241,43 +271,65 @@ Selector<R, AppState> createSelector2<AppState, S1, S2, R>(
 ///       mySelector3,
 ///       (int a, int b, int c) => a + b + c,
 ///     );
-Selector<R, AppState> createSelector3<AppState, S1, S2, S3, R>(
+BehaviorSubjectSelector<R, AppState> createSelector3<R, AppState, S1, S2, S3>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
   R Function(S1, S2, S3) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom2(
-        selector2(stream),
-        selector3(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<R> mappedStream = Rx.combineLatest3(s1, s2, s3, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3].every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing four [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState> createSelector4<AppState, S1, S2, S3, S4, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector4<R, AppState, S1, S2, S3, S4>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
   Selector<S4, AppState> selector4,
   R Function(S1, S2, S3, S4) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom3(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest4(s1, s2, s3, s4, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4].every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing five [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState> createSelector5<AppState, S1, S2, S3, S4, S5, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector5<R, AppState, S1, S2, S3, S4, S5>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
@@ -285,20 +337,33 @@ Selector<R, AppState> createSelector5<AppState, S1, S2, S3, S4, S5, R>(
   Selector<S5, AppState> selector5,
   R Function(S1, S2, S3, S4, S5) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom4(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        selector5(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<S5> s5 = selector5(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest5(s1, s2, s3, s4, s5, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4, s5].every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+        (s5 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing six [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState> createSelector6<AppState, S1, S2, S3, S4, S5, S6, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector6<R, AppState, S1, S2, S3, S4, S5, S6>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
@@ -307,21 +372,36 @@ Selector<R, AppState> createSelector6<AppState, S1, S2, S3, S4, S5, S6, R>(
   Selector<S6, AppState> selector6,
   R Function(S1, S2, S3, S4, S5, S6) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom5(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        selector5(stream),
-        selector6(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<S5> s5 = selector5(stream);
+    Stream<S6> s6 = selector6(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest6(s1, s2, s3, s4, s5, s6, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4, s5, s6]
+        .every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+        (s5 as BehaviorSubject).value,
+        (s6 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing seven [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState> createSelector7<AppState, S1, S2, S3, S4, S5, S6, S7, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector7<R, AppState, S1, S2, S3, S4, S5, S6, S7>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
@@ -331,23 +411,38 @@ Selector<R, AppState> createSelector7<AppState, S1, S2, S3, S4, S5, S6, S7, R>(
   Selector<S7, AppState> selector7,
   R Function(S1, S2, S3, S4, S5, S6, S7) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom6(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        selector5(stream),
-        selector6(stream),
-        selector7(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<S5> s5 = selector5(stream);
+    Stream<S6> s6 = selector6(stream);
+    Stream<S7> s7 = selector7(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest7(s1, s2, s3, s4, s5, s6, s7, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4, s5, s6, s7]
+        .every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+        (s5 as BehaviorSubject).value,
+        (s6 as BehaviorSubject).value,
+        (s7 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing eight [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState>
-    createSelector8<AppState, S1, S2, S3, S4, S5, S6, S7, S8, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector8<R, AppState, S1, S2, S3, S4, S5, S6, S7, S8>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
@@ -358,24 +453,40 @@ Selector<R, AppState>
   Selector<S8, AppState> selector8,
   R Function(S1, S2, S3, S4, S5, S6, S7, S8) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom7(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        selector5(stream),
-        selector6(stream),
-        selector7(stream),
-        selector8(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<S5> s5 = selector5(stream);
+    Stream<S6> s6 = selector6(stream);
+    Stream<S7> s7 = selector7(stream);
+    Stream<S8> s8 = selector8(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest8(s1, s2, s3, s4, s5, s6, s7, s8, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4, s5, s6, s7, s8]
+        .every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+        (s5 as BehaviorSubject).value,
+        (s6 as BehaviorSubject).value,
+        (s7 as BehaviorSubject).value,
+        (s8 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }
 
 /// A utility for composing nine [Selector] functions together to
 /// create a new [Selector]. The selector will only emit distinct values.
-Selector<R, AppState>
-    createSelector9<AppState, S1, S2, S3, S4, S5, S6, S7, S8, S9, R>(
+BehaviorSubjectSelector<R, AppState>
+    createSelector9<R, AppState, S1, S2, S3, S4, S5, S6, S7, S8, S9>(
   Selector<S1, AppState> selector1,
   Selector<S2, AppState> selector2,
   Selector<S3, AppState> selector3,
@@ -387,17 +498,34 @@ Selector<R, AppState>
   Selector<S9, AppState> selector9,
   R Function(S1, S2, S3, S4, S5, S6, S7, S8, S9) mapFn,
 ) {
-  return (stream) => selector1(stream)
-      .withLatestFrom8(
-        selector2(stream),
-        selector3(stream),
-        selector4(stream),
-        selector5(stream),
-        selector6(stream),
-        selector7(stream),
-        selector8(stream),
-        selector9(stream),
-        mapFn,
-      )
-      .distinct();
+  return (stream) {
+    Stream<S1> s1 = selector1(stream);
+    Stream<S2> s2 = selector2(stream);
+    Stream<S3> s3 = selector3(stream);
+    Stream<S4> s4 = selector4(stream);
+    Stream<S5> s5 = selector5(stream);
+    Stream<S6> s6 = selector6(stream);
+    Stream<S7> s7 = selector7(stream);
+    Stream<S8> s8 = selector8(stream);
+    Stream<S9> s9 = selector9(stream);
+    Stream<R> mappedStream =
+        Rx.combineLatest9(s1, s2, s3, s4, s5, s6, s7, s8, s9, mapFn).distinct();
+    BehaviorSubject<R> subject = BehaviorSubject();
+    if ([s1, s2, s3, s4, s5, s6, s7, s8, s9]
+        .every((element) => element is BehaviorSubject)) {
+      subject.add(mapFn(
+        (s1 as BehaviorSubject).value,
+        (s2 as BehaviorSubject).value,
+        (s3 as BehaviorSubject).value,
+        (s4 as BehaviorSubject).value,
+        (s5 as BehaviorSubject).value,
+        (s6 as BehaviorSubject).value,
+        (s7 as BehaviorSubject).value,
+        (s8 as BehaviorSubject).value,
+        (s9 as BehaviorSubject).value,
+      ));
+    }
+    subject.addStream(mappedStream);
+    return subject;
+  };
 }

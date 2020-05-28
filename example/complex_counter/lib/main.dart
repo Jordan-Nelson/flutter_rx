@@ -59,11 +59,11 @@ class HomePageBody extends StatelessWidget {
           Text(
             'The counter value is:',
           ),
-          StreamBuilder(
-            stream: StoreProvider.of<AppState>(context).select(selectCounter),
-            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+          StoreConnector(
+            selector: selectCounter,
+            builder: (BuildContext context, int value) {
               return Text(
-                snapshot.hasData ? snapshot.data.toString() : '',
+                value.toString(),
                 style: Theme.of(context).textTheme.headline4,
               );
             },
