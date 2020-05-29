@@ -56,17 +56,44 @@ class HomePageBody extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            'The counter value is:',
-          ),
-          StoreConnector(
-            selector: selectCounterSimple,
-            builder: (BuildContext context, int value) {
-              return Text(
-                value.toString(),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Value: ',
                 style: Theme.of(context).textTheme.headline4,
-              );
-            },
+              ),
+              StoreConnector(
+                selector: selectCounter,
+                builder: (BuildContext context, int value) {
+                  return Text(
+                    value.toString(),
+                    style: Theme.of(context).textTheme.headline4,
+                  );
+                },
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Multiplied Value: ',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              StoreConnector(
+                selector: selectCounterMultiplier,
+                props: 3,
+                builder: (BuildContext context, int value) {
+                  return Text(
+                    value.toString(),
+                    style: Theme.of(context).textTheme.headline4,
+                  );
+                },
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -41,11 +41,19 @@ class StoreProvider<T> extends InheritedWidget {
 class StoreConnector<State, T> extends StatelessWidget {
   final Selector<State, T> selector;
   final Widget Function(BuildContext, T) builder;
-  StoreConnector({@required this.selector, @required this.builder});
+  final dynamic props;
+  StoreConnector({
+    @required this.selector,
+    @required this.builder,
+    this.props,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Stream<T> stream = StoreProvider.of<State>(context).select(selector);
+    Stream<T> stream = StoreProvider.of<State>(context).select(
+      selector,
+      this.props,
+    );
     return RxStreamBuilder<T>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {

@@ -45,10 +45,11 @@ class Store<State> {
 
   BehaviorSubject<State> state = BehaviorSubject<State>();
 
-  Stream<R> select<R>(Selector<State, R> mapFn) {
-    Stream<R> newStream = this.state.map(mapFn).distinct();
+  Stream<R> select<R, P>(Selector<State, R> selector, [dynamic props]) {
+    Stream<R> newStream =
+        this.state.map((state) => selector(state, props)).distinct();
     BehaviorSubject<R> subject = BehaviorSubject();
-    subject.add(mapFn(this.state.value));
+    subject.add(selector(this.state.value, props));
     subject.addStream(newStream);
     return subject;
   }

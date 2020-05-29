@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 /// or handling actions in reducers or effects.
 class StoreAction {}
 
-typedef Selector<S, T> = T Function(S state);
+typedef Selector<S, T> = T Function(S state, dynamic props);
 
 /// A function that takes a [StoreAction] and a [State], and returns a new [State].
 typedef Reducer<State> = State Function(

@@ -7,7 +7,7 @@ import '../models/appState.dart';
 //
 // The selector below is a very simple example that maps the
 // state to the value of the counter.
-Selector<AppState, int> selectCounterSimple = (AppState state) {
+Selector<AppState, int> selectCounterSimple = (AppState state, props) {
   return state.counter;
 };
 
@@ -18,13 +18,15 @@ Selector<AppState, int> selectCounterSimple = (AppState state) {
 // provide performance benefits, particularly with
 // selectors that perform expensive computation.
 Selector<AppState, int> selectCounter = createSelector(
-  (AppState state) => state.counter,
+  (AppState state, [_]) => state.counter,
 );
 
-Selector<AppState, int> selectCounter1 = createSelector1(
-  selectCounter,
-  (int value) {
-    return value;
+// The selector below uses the second argument of props to calulate
+// the returned value. Props can be use to pass in info like an
+// id of an object to select that specific object from the store
+Selector<AppState, int> selectCounterMultiplier = createSelector(
+  (AppState state, props) {
+    return state.counter * props;
   },
 );
 
@@ -35,7 +37,7 @@ Selector<AppState, int> selectCounter1 = createSelector1(
 // new value.
 Selector<AppState, int> selectCounterDouble = createSelector2(
   selectCounter,
-  selectCounter,
+  selectCounterMultiplier,
   (int a, int b) {
     return a + b;
   },

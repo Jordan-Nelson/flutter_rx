@@ -4,13 +4,10 @@ import 'package:memoize/memoize.dart';
 /// Create a memoized selector. It will cache the result of the
 /// [mapFn] function, and only recompute when the provided selector
 /// delivers new results.
-Selector<S, T> createSelector<S, T>(
-  T Function(S) mapFn, {
-  T Function(S) Function(T Function(S)) memoize,
-}) {
-  final memoized = (memoize ?? memo1)(mapFn);
-  return (S state) {
-    return memoized(state);
+Selector<S, T> createSelector<S, T>(Selector<S, T> mapFn) {
+  final memoized = memo2(mapFn);
+  return (S state, dynamic props) {
+    return memoized(state, props);
   };
 }
 
@@ -24,8 +21,8 @@ Selector<S, T> createSelector1<S, R1, T>(
 }) {
   final memoized = (memoize ?? memo1)(mapFn);
 
-  return (S state) {
-    return memoized(selector(state));
+  return (S state, dynamic props) {
+    return memoized(selector(state, props));
   };
 }
 
@@ -40,8 +37,8 @@ Selector<S, T> createSelector2<S, R1, R2, T>(
 }) {
   final memoized = (memoize ?? memo2)(mapFn);
 
-  return (S state) {
-    return memoized(selector1(state), selector2(state));
+  return (S state, dynamic props) {
+    return memoized(selector1(state, props), selector2(state, props));
   };
 }
 
@@ -57,11 +54,11 @@ Selector<S, T> createSelector3<S, R1, R2, R3, T>(
 }) {
   final memoized = (memoize ?? memo3)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
     );
   };
 }
@@ -81,12 +78,12 @@ Selector<S, T> createSelector4<S, R1, R2, R3, R4, T>(
 }) {
   final memoized = (memoize ?? memo4)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
     );
   };
 }
@@ -108,13 +105,13 @@ Selector<S, T> createSelector5<S, R1, R2, R3, R4, R5, T>(
 }) {
   final memoized = (memoize ?? memo5)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
     );
   };
 }
@@ -138,14 +135,14 @@ Selector<S, T> createSelector6<S, R1, R2, R3, R4, R5, R6, T>(
 }) {
   final memoized = (memoize ?? memo6)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
-      selector6(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
+      selector6(state, props),
     );
   };
 }
@@ -170,15 +167,15 @@ Selector<S, T> createSelector7<S, R1, R2, R3, R4, R5, R6, R7, T>(
 }) {
   final memoized = (memoize ?? memo7)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
-      selector6(state),
-      selector7(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
+      selector6(state, props),
+      selector7(state, props),
     );
   };
 }
@@ -204,16 +201,16 @@ Selector<S, T> createSelector8<S, R1, R2, R3, R4, R5, R6, R7, R8, T>(
 }) {
   final memoized = (memoize ?? memo8)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
-      selector6(state),
-      selector7(state),
-      selector8(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
+      selector6(state, props),
+      selector7(state, props),
+      selector8(state, props),
     );
   };
 }
@@ -240,17 +237,17 @@ Selector<S, T> createSelector9<S, R1, R2, R3, R4, R5, R6, R7, R8, R9, T>(
 }) {
   final memoized = (memoize ?? memo9)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
-      selector6(state),
-      selector7(state),
-      selector8(state),
-      selector9(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
+      selector6(state, props),
+      selector7(state, props),
+      selector8(state, props),
+      selector9(state, props),
     );
   };
 }
@@ -278,18 +275,18 @@ Selector<S, T> createSelector10<S, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, T>(
 }) {
   final memoized = (memoize ?? memo10)(mapFn);
 
-  return (S state) {
+  return (S state, dynamic props) {
     return memoized(
-      selector1(state),
-      selector2(state),
-      selector3(state),
-      selector4(state),
-      selector5(state),
-      selector6(state),
-      selector7(state),
-      selector8(state),
-      selector9(state),
-      selector10(state),
+      selector1(state, props),
+      selector2(state, props),
+      selector3(state, props),
+      selector4(state, props),
+      selector5(state, props),
+      selector6(state, props),
+      selector7(state, props),
+      selector8(state, props),
+      selector9(state, props),
+      selector10(state, props),
     );
   };
 }
