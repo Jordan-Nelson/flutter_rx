@@ -38,7 +38,7 @@ Selector<AppState, int> selectCounterMultiplier = createSelector(
 Selector<AppState, int> selectCounterDouble = createSelector2(
   selectCounter,
   selectCounterMultiplier,
-  (int a, int b) {
+  (int a, int b, props) {
     return a + b;
   },
 );
