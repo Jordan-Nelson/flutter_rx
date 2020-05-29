@@ -60,7 +60,7 @@ class HomePageBody extends StatelessWidget {
             'The counter value is:',
           ),
           StoreConnector(
-            selector: selectCounter,
+            selector: selectCounterSimple,
             builder: (BuildContext context, int value) {
               return Text(
                 value.toString(),

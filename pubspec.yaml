@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   rxdart: ^0.24.1
+  memoize: ^2.0.0
 
 dev_dependencies:
   flutter_test:
