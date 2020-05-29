@@ -10,4 +10,8 @@ class AppState {
       counter: counter ?? this.counter,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is AppState && counter == other.counter;
 }
