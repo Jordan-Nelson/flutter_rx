@@ -28,9 +28,14 @@ class Store<State> {
     }
     if (this.effects != null) {
       effects.forEach((Effect<State> effect) {
-        return effect(this.effectsActionStream, this).listen((action) {
-          if (action is StoreAction) {
-            this.dispatch(action);
+        return effect(this.effectsActionStream, this).listen((effectResult) {
+          if (effectResult is StoreAction) {
+            this.dispatch(effectResult);
+          }
+          if (effectResult is List<StoreAction>) {
+            effectResult.forEach((action) {
+              this.dispatch(action);
+            });
           }
         });
       });
