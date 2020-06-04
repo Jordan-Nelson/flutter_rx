@@ -56,12 +56,15 @@ class StoreConnector<S, T> extends StatefulWidget {
 }
 
 class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
-  T latestValue;
   @override
   void initState() {
     if (widget.onInitialBuild != null)
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onInitialBuild(latestValue);
+        T value = widget.selector(
+          StoreProvider.of<S>(context).state.value,
+          widget.props,
+        );
+        widget.onInitialBuild(value);
       });
 
     super.initState();
@@ -69,14 +72,10 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
 
   @override
   Widget build(BuildContext context) {
-    Stream<T> stream = StoreProvider.of<S>(context)
-        .select(
+    Stream<T> stream = StoreProvider.of<S>(context).select(
       widget.selector,
       this.widget.props,
-    )
-        .doOnData((event) {
-      latestValue = event;
-    });
+    );
     return RxStreamBuilder<T>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
