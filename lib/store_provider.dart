@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:flutter_rx/rx_stream_builder.dart';
 import 'package:flutter_rx/store.dart';
 import 'package:flutter_rx/types.dart';
@@ -38,26 +39,48 @@ class StoreProvider<T> extends InheritedWidget {
 ///
 /// This widget is helpful in migrating from flutter_redux as it
 /// has a similar interface to StoreConnector from flutter_redux
-class StoreConnector<State, T> extends StatelessWidget {
-  final Selector<State, T> selector;
+class StoreConnector<S, T> extends StatefulWidget {
+  final Selector<S, T> selector;
   final Widget Function(BuildContext, T) builder;
+  final Function(T) onInitialBuild;
   final dynamic props;
   StoreConnector({
     @required this.selector,
     @required this.builder,
     this.props,
+    this.onInitialBuild,
   });
 
   @override
+  _StoreConnectorState<S, T> createState() => _StoreConnectorState<S, T>();
+}
+
+class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
+  T latestValue;
+  @override
+  void initState() {
+    if (widget.onInitialBuild != null)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onInitialBuild(latestValue);
+      });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Stream<T> stream = StoreProvider.of<State>(context).select(
-      selector,
-      this.props,
-    );
+    Stream<T> stream = StoreProvider.of<S>(context)
+        .select(
+      widget.selector,
+      this.widget.props,
+    )
+        .doOnData((event) {
+      latestValue = event;
+    });
     return RxStreamBuilder<T>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
-        return builder(context, snapshot.data);
+        return widget.builder(context, snapshot.data);
       },
     );
   }
