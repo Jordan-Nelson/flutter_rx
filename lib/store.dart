@@ -32,7 +32,8 @@ class Store<State> {
           if (effectResult is StoreAction) {
             this.dispatch(effectResult);
           }
-          if (effectResult is List<StoreAction>) {
+          if (effectResult is List &&
+              effectResult.every((element) => element is StoreAction)) {
             effectResult.forEach((action) {
               this.dispatch(action);
             });
