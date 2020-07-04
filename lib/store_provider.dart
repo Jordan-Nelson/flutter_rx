@@ -42,12 +42,14 @@ class StoreProvider<T> extends InheritedWidget {
 class StoreConnector<S, T> extends StatefulWidget {
   final Selector<S, T> selector;
   final Widget Function(BuildContext, T) builder;
-  final Function(T) onInitialBuild;
+  final void Function() onInit;
+  final void Function(T) onInitialBuild;
   final dynamic props;
   StoreConnector({
     @required this.selector,
     @required this.builder,
     this.props,
+    this.onInit,
     this.onInitialBuild,
   });
 
@@ -58,6 +60,9 @@ class StoreConnector<S, T> extends StatefulWidget {
 class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
   @override
   void initState() {
+    if (widget.onInit != null) {
+      widget.onInit();
+    }
     if (widget.onInitialBuild != null)
       WidgetsBinding.instance.addPostFrameCallback((_) {
         T value = widget.selector(
