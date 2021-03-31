@@ -1,4 +1,4 @@
-import 'package:flutter_rx/types.dart';
+import './types.dart';
 import 'package:memoize/memoize.dart';
 
 /// Create a memoized selector. It will cache the result of the

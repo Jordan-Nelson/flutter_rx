@@ -1,7 +1,7 @@
 library flutter_rx;
 
-export './selectors.dart';
-export './reducer.dart';
-export './store.dart';
-export './store_provider.dart';
-export './types.dart';
+export './src/selectors.dart';
+export './src/reducer.dart';
+export './src/store.dart';
+export './src/store_provider.dart';
+export './src/types.dart';

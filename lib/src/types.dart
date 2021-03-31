@@ -1,4 +1,4 @@
-import 'package:flutter_rx/store.dart';
+import './store.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// A base class for all Actions to extend.

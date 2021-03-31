@@ -1,8 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:flutter_rx/rx_stream_builder.dart';
-import 'package:flutter_rx/store.dart';
-import 'package:flutter_rx/types.dart';
+import './rx_stream_builder.dart';
+import './store.dart';
+import './types.dart';
 
 /// Provides a [Store] to all descendants of this Widget. This should
 /// generally be a root widget in your app and your app should only

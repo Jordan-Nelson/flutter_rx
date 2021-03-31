@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_rx/types.dart';
+import './types.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Creates a store that holds the app state.

@@ -1,4 +1,4 @@
-import 'package:flutter_rx/types.dart';
+import './types.dart';
 
 /// A utility function that combines several [On] reducer objects.
 ///
