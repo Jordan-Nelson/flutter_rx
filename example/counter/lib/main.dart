@@ -37,7 +37,7 @@ class FlutterRxApp extends StatelessWidget {
     // The StoreProvider should wrap your MaterialApp or WidgetsApp. This will
     // ensure all routes have access to the store.
     //
-    // StorePrivider is just an InheritedWidget
+    // StoreProvider is just an InheritedWidget
     // This is the simplest way to provide your store to all ancestors,
     // but you are free to use other means of doing so if it better suits your needs
     return StoreProvider<int>(
