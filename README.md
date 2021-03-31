@@ -1,6 +1,6 @@
 # flutter_rx
 
-A redux style state management library, loosely inspired by [NgRx](https://ngrx.io/) as well as flutter_redux.
+A redux style state management library, loosely inspired by [NgRx](https://ngrx.io/) as well as [flutter_redux](https://github.com/brianegan/flutter_redux) and [redux](https://github.com/fluttercommunity/redux.dart).
 
 ## Key concepts
 
