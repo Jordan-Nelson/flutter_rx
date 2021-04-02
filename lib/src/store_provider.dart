@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:rxdart/rxdart.dart';
 import './rx_stream_builder.dart';
 import './store.dart';
 import './types.dart';
