@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import './types.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -13,7 +12,7 @@ import 'package:rxdart/rxdart.dart';
 /// The store can be provided to a widget tree using [StoreProvider].
 class Store<State> {
   Store({
-    @required State initialState,
+    required State initialState,
     this.reducer,
     this.effects,
   }) {
@@ -21,14 +20,14 @@ class Store<State> {
     state.add(initialState);
     if (this.reducer != null) {
       actionStream.listen((StoreAction action) {
-        State newState = this.reducer(state.value, action);
+        State newState = this.reducer!(state.value!, action);
         state.add(newState);
         effectsActionStream.add(action);
       });
     }
     if (this.effects != null) {
-      effects.forEach((Effect<State> effect) {
-        return effect(this.effectsActionStream, this).listen((effectResult) {
+      effects!.forEach((Effect<State> effect) {
+        effect(this.effectsActionStream, this).listen((effectResult) {
           if (effectResult is StoreAction) {
             this.dispatch(effectResult);
           }
@@ -43,8 +42,8 @@ class Store<State> {
     }
   }
 
-  Reducer<State> reducer;
-  List<Effect<State>> effects;
+  Reducer<State>? reducer;
+  List<Effect<State>>? effects;
   BehaviorSubject<StoreAction> actionStream = BehaviorSubject<StoreAction>();
   BehaviorSubject<StoreAction> effectsActionStream =
       BehaviorSubject<StoreAction>();
@@ -55,7 +54,7 @@ class Store<State> {
     Stream<R> newStream =
         this.state.map((state) => selector(state, props)).distinct();
     BehaviorSubject<R> subject = BehaviorSubject();
-    subject.add(selector(this.state.value, props));
+    subject.add(selector(this.state.value!, props));
     subject.addStream(newStream);
     return subject;
   }
