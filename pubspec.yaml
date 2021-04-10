@@ -1,7 +1,7 @@
 name: flutter_rx
 description: A redux style state management library, loosely inspired by NgRx.
 repository: https://github.com/Jordan-Nelson/flutter_rx
-version: 0.2.0
+version: 0.2.1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
