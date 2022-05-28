@@ -13,7 +13,7 @@ class StoreProvider<T> extends InheritedWidget {
     Key? key,
     required Store<T> store,
     required Widget child,
-  })   : _store = store,
+  })  : _store = store,
         super(key: key, child: child);
 
   final Store<T> _store;
@@ -64,7 +64,7 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S?, T?>> {
       widget.onInit!();
     }
     if (widget.onInitialBuild != null)
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         T? value = widget.selector(
           StoreProvider.of<S>(context).state.value,
           widget.props,
