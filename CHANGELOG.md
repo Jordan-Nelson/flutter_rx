@@ -1,11 +1,15 @@
-# 0.1.2
+# 0.2.2
 
-- initial release
-
-# 0.2.0
-
-- null safety
+- fix: remove null aware operator
 
 # 0.2.1
 
-- add `value` getter to store
+- feat:add `value` getter to store
+
+# 0.2.0
+
+- feat: null safety support
+
+# 0.1.2
+
+- initial release
