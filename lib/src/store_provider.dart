@@ -54,10 +54,10 @@ class StoreConnector<S, T> extends StatefulWidget {
   });
 
   @override
-  _StoreConnectorState<S, T> createState() => _StoreConnectorState<S, T>();
+  State<StoreConnector<S, T>> createState() => _StoreConnectorState<S, T>();
 }
 
-class _StoreConnectorState<S, T> extends State<StoreConnector<S?, T?>> {
+class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
   @override
   void initState() {
     if (widget.onInit != null) {
@@ -66,10 +66,10 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S?, T?>> {
     if (widget.onInitialBuild != null)
       WidgetsBinding.instance.addPostFrameCallback((_) {
         T? value = widget.selector(
-          StoreProvider.of<S>(context).state.value,
+          StoreProvider.of<S>(context).state.value!,
           widget.props,
         );
-        widget.onInitialBuild!(value);
+        widget.onInitialBuild!(value!);
       });
 
     super.initState();
@@ -84,7 +84,10 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S?, T?>> {
     return RxStreamBuilder<T?>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T?> snapshot) {
-        return widget.builder(context, snapshot.data);
+        if (!(snapshot.data is T)) {
+          return Container();
+        }
+        return widget.builder(context, snapshot.data as T);
       },
     );
   }
