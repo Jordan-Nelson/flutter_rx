@@ -1,3 +1,13 @@
+# 0.3.0
+
+### Breaking Changes
+
+- bump min dart sdk to 2.17.0
+
+### Fixes
+
+- filter out initial null frame
+
 # 0.2.2
 
 - fix: remove null aware operator
