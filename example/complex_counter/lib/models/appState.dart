@@ -14,4 +14,7 @@ class AppState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) || other is AppState && counter == other.counter;
+
+  @override
+  int get hashCode => counter.hashCode;
 }
