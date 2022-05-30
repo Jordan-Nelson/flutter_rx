@@ -1,3 +1,9 @@
+# 0.4.0
+
+### Breaking Changes
+
+- State must extend class `StoreState`
+
 # 0.3.1
 
 - chore: follow flutter_lints
