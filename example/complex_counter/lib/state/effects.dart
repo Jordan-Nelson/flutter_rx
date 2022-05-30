@@ -59,7 +59,9 @@ Effect<AppState> writeLocalStorageSuccessEffect = (
       .whereType<WriteLocalStorageCounterSuccessAction>()
       .map((action) {
     String message = 'Value of ${action.value} saved to local storage';
-    Scaffold.of(action.context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(action.context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   });
 };
 

@@ -98,7 +98,7 @@ class HomePageBody extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () {
                   StoreProvider.of<AppState>(context).dispatch(
                     ChangeCounterByValueAction(value: -5),
@@ -107,7 +107,7 @@ class HomePageBody extends StatelessWidget {
                 child: Text('-5'),
               ),
               Container(width: 8),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () {
                   StoreProvider.of<AppState>(context).dispatch(
                     DecrementCounterAction(),
@@ -116,7 +116,7 @@ class HomePageBody extends StatelessWidget {
                 child: Text('-1'),
               ),
               Container(width: 8),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () {
                   StoreProvider.of<AppState>(context).dispatch(
                     IncrementCounterAction(),
@@ -125,7 +125,7 @@ class HomePageBody extends StatelessWidget {
                 child: Text('+1'),
               ),
               Container(width: 8),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () {
                   StoreProvider.of<AppState>(context).dispatch(
                     ChangeCounterByValueAction(value: 5),
@@ -140,7 +140,7 @@ class HomePageBody extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       StoreProvider.of<AppState>(context).dispatch(
                         ResetCounterAction(),
@@ -157,7 +157,7 @@ class HomePageBody extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       StoreProvider.of<AppState>(context).dispatch(
                         WriteLocalStorageCounterAction(context: context),
@@ -174,7 +174,7 @@ class HomePageBody extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       StoreProvider.of<AppState>(context).dispatch(
                         ReadLocalStorageCounterAction(),

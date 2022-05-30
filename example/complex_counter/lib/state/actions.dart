@@ -13,13 +13,13 @@ class ResetCounterAction extends StoreAction {}
 // An action to set the counter to a specific value
 class SetCounterAction extends StoreAction {
   SetCounterAction({@required this.value});
-  int value;
+  final int value;
 }
 
 // An action to change the counter by a specific value
 class ChangeCounterByValueAction extends StoreAction {
   ChangeCounterByValueAction({@required this.value});
-  int value;
+  final int value;
 }
 
 // An action to read the counter value from local storage
@@ -28,7 +28,7 @@ class ReadLocalStorageCounterAction extends StoreAction {}
 // An action to write the counter value to local storage
 class WriteLocalStorageCounterAction extends StoreAction {
   WriteLocalStorageCounterAction({this.context});
-  BuildContext context;
+  final BuildContext context;
 }
 
 // An action to indicate the counter has been written to local storage
@@ -37,8 +37,8 @@ class WriteLocalStorageCounterSuccessAction extends StoreAction {
     @required this.context,
     @required this.value,
   });
-  BuildContext context;
-  int value;
+  final BuildContext context;
+  final int value;
 }
 
 // An action to indicate the counter has failed to write to local storage

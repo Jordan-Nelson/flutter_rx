@@ -4,7 +4,9 @@ import 'package:rxdart/rxdart.dart';
 /// A base class for all Actions to extend.
 /// This allows for type safety when dispatching actions
 /// or handling actions in reducers or effects.
-class StoreAction {}
+abstract class StoreAction {
+  const StoreAction();
+}
 
 typedef Selector<S, T> = T Function(S state, dynamic props);
 

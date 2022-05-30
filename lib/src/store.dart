@@ -18,27 +18,27 @@ class Store<State> {
   }) {
     assert(initialState != null);
     state.add(initialState);
-    if (this.reducer != null) {
+    if (reducer != null) {
       actionStream.listen((StoreAction action) {
-        State newState = this.reducer!(state.value!, action);
+        State newState = reducer!(state.value!, action);
         state.add(newState);
         effectsActionStream.add(action);
       });
     }
-    if (this.effects != null) {
-      effects!.forEach((Effect<State> effect) {
-        effect(this.effectsActionStream, this).listen((effectResult) {
+    if (effects != null) {
+      for (var effect in effects!) {
+        effect(effectsActionStream, this).listen((effectResult) {
           if (effectResult is StoreAction) {
-            this.dispatch(effectResult);
+            dispatch(effectResult);
           }
           if (effectResult is List &&
               effectResult.every((element) => element is StoreAction)) {
-            effectResult.forEach((action) {
-              this.dispatch(action);
-            });
+            for (var action in effectResult) {
+              dispatch(action);
+            }
           }
         });
-      });
+      }
     }
   }
 
@@ -50,13 +50,13 @@ class Store<State> {
 
   BehaviorSubject<State> state = BehaviorSubject<State>();
 
-  State? get value => state.value;
+  State get value => state.value;
 
   Stream<R> select<R, P>(Selector<State, R> selector, [dynamic props]) {
     Stream<R> newStream =
-        this.state.map((state) => selector(state, props)).distinct();
+        state.map((state) => selector(state, props)).distinct();
     BehaviorSubject<R> subject = BehaviorSubject();
-    subject.add(selector(this.state.value!, props));
+    subject.add(selector(state.value!, props));
     subject.addStream(newStream);
     return subject;
   }

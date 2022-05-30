@@ -26,7 +26,7 @@ class StoreProvider<T> extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(_) => false;
+  bool updateShouldNotify(oldWidget) => false;
 }
 
 /// Build a widget based on the state of the [Store].
@@ -44,7 +44,8 @@ class StoreConnector<S, T> extends StatefulWidget {
   final void Function()? onInit;
   final void Function(T)? onInitialBuild;
   final dynamic props;
-  StoreConnector({
+  const StoreConnector({
+    super.key,
     required this.selector,
     required this.builder,
     this.props,
@@ -62,14 +63,15 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
     if (widget.onInit != null) {
       widget.onInit!();
     }
-    if (widget.onInitialBuild != null)
+    if (widget.onInitialBuild != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        T? value = widget.selector(
+        T value = widget.selector(
           StoreProvider.of<S>(context).state.value!,
           widget.props,
         );
-        widget.onInitialBuild!(value!);
+        widget.onInitialBuild!(value);
       });
+    }
 
     super.initState();
   }
@@ -78,12 +80,12 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
   Widget build(BuildContext context) {
     Stream<T?> stream = StoreProvider.of<S>(context).select(
       widget.selector,
-      this.widget.props,
+      widget.props,
     );
     return RxStreamBuilder<T?>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T?> snapshot) {
-        if (!(snapshot.data is T)) {
+        if (snapshot.data is! T) {
           return Container();
         }
         return widget.builder(context, snapshot.data as T);
