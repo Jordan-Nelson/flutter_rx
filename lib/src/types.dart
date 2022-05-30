@@ -1,11 +1,19 @@
+import 'package:flutter/material.dart';
+
 import './store.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// A base class for all Actions to extend.
 /// This allows for type safety when dispatching actions
 /// or handling actions in reducers or effects.
+@immutable
 abstract class StoreAction {
   const StoreAction();
+}
+
+@immutable
+abstract class StoreState {
+  const StoreState();
 }
 
 typedef Selector<S, T> = T Function(S state, dynamic props);
@@ -25,7 +33,7 @@ typedef ActionReducer<State, Action extends StoreAction> = State Function(
 /// A function that handles an incoming stream of actions, optionally
 /// performs side effects upon receiving an action, and optionally returns
 /// a new `StoreAction` which will be dispatched by the store.
-typedef Effect<State> = Stream<dynamic> Function(
+typedef Effect<State extends StoreState> = Stream<dynamic> Function(
   BehaviorSubject<StoreAction>,
   Store<State> store,
 );

@@ -7,19 +7,19 @@ import './types.dart';
 /// generally be a root widget in your app and your app should only
 /// conatin one [Store]. Connect to the Store provided by this Widget
 /// using `StoreProvider.of<T>(context)`.
-class StoreProvider<T> extends InheritedWidget {
+class StoreProvider<S extends StoreState> extends InheritedWidget {
   const StoreProvider({
     Key? key,
-    required Store<T> store,
+    required Store<S> store,
     required Widget child,
   })  : _store = store,
         super(key: key, child: child);
 
-  final Store<T> _store;
+  final Store<S> _store;
 
-  static Store<T> of<T>(BuildContext context) {
-    StoreProvider<T>? storeProvider =
-        context.dependOnInheritedWidgetOfExactType<StoreProvider<T>>();
+  static Store<S> of<S extends StoreState>(BuildContext context) {
+    StoreProvider<S>? storeProvider =
+        context.dependOnInheritedWidgetOfExactType<StoreProvider<S>>();
     assert(storeProvider != null,
         "StoreProvider was null. Make sure that there is a StoreProvider provided.");
     return storeProvider!._store;
@@ -38,7 +38,7 @@ class StoreProvider<T> extends InheritedWidget {
 ///
 /// This widget is helpful in migrating from flutter_redux as it
 /// has a similar interface to StoreConnector from flutter_redux
-class StoreConnector<S, T> extends StatefulWidget {
+class StoreConnector<S extends StoreState, T> extends StatefulWidget {
   final Selector<S, T> selector;
   final Widget Function(BuildContext, T) builder;
   final void Function()? onInit;
@@ -57,7 +57,8 @@ class StoreConnector<S, T> extends StatefulWidget {
   State<StoreConnector<S, T>> createState() => _StoreConnectorState<S, T>();
 }
 
-class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
+class _StoreConnectorState<S extends StoreState, T>
+    extends State<StoreConnector<S, T>> {
   @override
   void initState() {
     if (widget.onInit != null) {
@@ -66,7 +67,7 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
     if (widget.onInitialBuild != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         T value = widget.selector(
-          StoreProvider.of<S>(context).state.value!,
+          StoreProvider.of<S>(context).state.value,
           widget.props,
         );
         widget.onInitialBuild!(value);
@@ -78,16 +79,13 @@ class _StoreConnectorState<S, T> extends State<StoreConnector<S, T>> {
 
   @override
   Widget build(BuildContext context) {
-    Stream<T?> stream = StoreProvider.of<S>(context).select(
+    Stream<T> stream = StoreProvider.of<S>(context).select(
       widget.selector,
       widget.props,
     );
-    return RxStreamBuilder<T?>(
+    return RxStreamBuilder<T>(
       stream: stream,
-      builder: (BuildContext context, AsyncSnapshot<T?> snapshot) {
-        if (snapshot.data is! T) {
-          return Container();
-        }
+      builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
         return widget.builder(context, snapshot.data as T);
       },
     );

@@ -10,17 +10,16 @@ import 'package:rxdart/rxdart.dart';
 /// been run and a new state has been returned.
 ///
 /// The store can be provided to a widget tree using [StoreProvider].
-class Store<State> {
+class Store<S extends StoreState> {
   Store({
-    required State initialState,
+    required S initialState,
     this.reducer,
     this.effects,
   }) {
-    assert(initialState != null);
     state.add(initialState);
     if (reducer != null) {
       actionStream.listen((StoreAction action) {
-        State newState = reducer!(state.value!, action);
+        S newState = reducer!(state.value, action);
         state.add(newState);
         effectsActionStream.add(action);
       });
@@ -42,21 +41,21 @@ class Store<State> {
     }
   }
 
-  Reducer<State>? reducer;
-  List<Effect<State>>? effects;
-  BehaviorSubject<StoreAction> actionStream = BehaviorSubject<StoreAction>();
-  BehaviorSubject<StoreAction> effectsActionStream =
-      BehaviorSubject<StoreAction>();
+  Reducer<S>? reducer;
+  List<Effect<S>>? effects;
 
-  BehaviorSubject<State> state = BehaviorSubject<State>();
+  final actionStream = BehaviorSubject<StoreAction>();
+  final effectsActionStream = BehaviorSubject<StoreAction>();
 
-  State get value => state.value;
+  final state = BehaviorSubject<S>();
 
-  Stream<R> select<R, P>(Selector<State, R> selector, [dynamic props]) {
+  S get value => state.value;
+
+  Stream<R> select<R, P>(Selector<S, R> selector, [dynamic props]) {
     Stream<R> newStream =
         state.map((state) => selector(state, props)).distinct();
     BehaviorSubject<R> subject = BehaviorSubject();
-    subject.add(selector(state.value!, props));
+    subject.add(selector(state.value, props));
     subject.addStream(newStream);
     return subject;
   }

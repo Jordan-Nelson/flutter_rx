@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_rx/flutter_rx.dart';
 
 @immutable
-class AppState {
+class AppState extends StoreState {
   final int counter;
   AppState({this.counter = 0});
 

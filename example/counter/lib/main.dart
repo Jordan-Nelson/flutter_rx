@@ -7,18 +7,23 @@ class Increment extends StoreAction {}
 
 // The reducer, which takes the previous count and increments it in response
 // to an Increment action.
-int counterReducer(int state, dynamic action) {
+AppState counterReducer(AppState state, dynamic action) {
   if (action is Increment) {
-    return state + 1;
+    return AppState(counter: state.counter + 1);
   }
   return state;
+}
+
+class AppState extends StoreState {
+  const AppState({@required this.counter});
+  final int counter;
 }
 
 void main() {
   // Create your store as a final variable in the main function
   // or inside a State object.
-  Store<int> store = Store<int>(
-    initialState: 0,
+  Store<AppState> store = Store<AppState>(
+    initialState: AppState(counter: 0),
     reducer: counterReducer,
   );
 
@@ -28,7 +33,7 @@ void main() {
 }
 
 class FlutterRxApp extends StatelessWidget {
-  final Store<int> store;
+  final Store<AppState> store;
 
   FlutterRxApp({Key key, this.store}) : super(key: key);
 
@@ -40,7 +45,7 @@ class FlutterRxApp extends StatelessWidget {
     // StoreProvider is just an InheritedWidget
     // This is the simplest way to provide your store to all ancestors,
     // but you are free to use other means of doing so if it better suits your needs
-    return StoreProvider<int>(
+    return StoreProvider<AppState>(
       // Pass the store to the StoreProvider so that any ancestor will have access.
       store: store,
       child: MaterialApp(
@@ -78,7 +83,9 @@ class HomePage extends StatelessWidget {
             // automatically rebuilt with the latest count.
             StreamBuilder(
               // Use the StoreProvider to get the store pass in the state
-              stream: StoreProvider.of<int>(context).state,
+              stream: StoreProvider.of<AppState>(context)
+                  .state
+                  .map((state) => state.counter),
               builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                 return Text(
                   snapshot.hasData ? snapshot.data.toString() : '',
@@ -92,7 +99,7 @@ class HomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         // Use the StoreProvider to get the store and call the dispatch methed
         // with the increment action
-        onPressed: () => StoreProvider.of<int>(context).dispatch(
+        onPressed: () => StoreProvider.of<AppState>(context).dispatch(
           Increment(),
         ),
         tooltip: 'Increment',
