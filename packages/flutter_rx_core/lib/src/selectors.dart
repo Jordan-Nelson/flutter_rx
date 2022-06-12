@@ -1,4 +1,4 @@
-import './types.dart';
+import 'package:flutter_rx_core/src/types.dart';
 import 'package:memoize/memoize.dart';
 
 /// Create a selector from the App's State.

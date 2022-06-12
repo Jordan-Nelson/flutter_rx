@@ -1,4 +1,6 @@
-import './types.dart';
+import 'package:flutter_rx_core/src/reducer.dart';
+import 'package:flutter_rx_core/src/types.dart';
+
 import 'package:rxdart/rxdart.dart';
 
 /// Creates a store that holds the app's state.

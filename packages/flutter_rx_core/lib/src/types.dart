@@ -1,7 +1,7 @@
+import 'package:flutter_rx_core/src/store.dart';
+import 'package:flutter_rx_core/src/reducer.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
-
-import './store.dart';
 
 /// A base class for all Actions to extend.
 /// This allows for type safety when dispatching actions
@@ -11,20 +11,13 @@ abstract class StoreAction {
   const StoreAction();
 }
 
+/// The immutable state managed by the store.
 @immutable
 abstract class StoreState {
   const StoreState();
 }
 
 typedef Selector<S, T> = T Function(S state, dynamic props);
-
-/// {@template flutter_rx_core.types.reducer}
-/// A function that takes a [StoreAction] and a [State], and returns a new [State].
-/// {@endtemplate}
-typedef Reducer<State> = State Function(
-  State state,
-  StoreAction action,
-);
 
 /// A [Reducer] function that accepts a [StoreAction] of a specific type.
 typedef ActionReducer<State, Action extends StoreAction> = State Function(

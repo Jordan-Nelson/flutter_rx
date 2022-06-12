@@ -1,4 +1,12 @@
-import './types.dart';
+import 'package:flutter_rx_core/src/types.dart';
+
+/// {@template flutter_rx_core.types.reducer}
+/// A function that takes a [StoreAction] and a [State], and returns a new [State].
+/// {@endtemplate}
+typedef Reducer<State> = State Function(
+  State state,
+  StoreAction action,
+);
 
 /// A utility function that combines several [On] reducer objects.
 ///
