@@ -13,14 +13,42 @@ env:
 
 jobs:
   job_001:
-    name: "test; linux; Dart dev; `dart test -p chrome`"
+    name: "test; linux; Flutter beta; PKG: packages/flutter_rx; `flutter test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:packages/flutter_rx;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:packages/flutter_rx
+            os:ubuntu-latest;pub-cache-hosted;sdk:beta
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: subosito/flutter-action@v2.3.0
+        with:
+          channel: beta
+      - id: checkout
+        uses: actions/checkout@v3
+      - id: packages_flutter_rx_pub_upgrade
+        name: packages/flutter_rx; flutter pub pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: packages/flutter_rx
+        run: flutter pub pub upgrade
+      - name: packages/flutter_rx; flutter test
+        if: "always() && steps.packages_flutter_rx_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/flutter_rx
+        run: flutter test
+  job_002:
+    name: "test; linux; Dart dev; PKG: packages/flutter_rx_core; `dart test -p chrome`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core;commands:test_1"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
@@ -40,15 +68,43 @@ jobs:
         if: "always() && steps.packages_flutter_rx_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/flutter_rx_core
         run: dart test -p chrome
-  job_002:
-    name: "test; linux; Dart stable; `dart test -p chrome`"
+  job_003:
+    name: "test; linux; Flutter stable; PKG: packages/flutter_rx; `flutter test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: subosito/flutter-action@v2.3.0
+        with:
+          channel: stable
+      - id: checkout
+        uses: actions/checkout@v3
+      - id: packages_flutter_rx_pub_upgrade
+        name: packages/flutter_rx; flutter pub pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: packages/flutter_rx
+        run: flutter pub pub upgrade
+      - name: packages/flutter_rx; flutter test
+        if: "always() && steps.packages_flutter_rx_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/flutter_rx
+        run: flutter test
+  job_004:
+    name: "test; linux; Dart stable; PKG: packages/flutter_rx_core; `dart test -p chrome`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core;commands:test_1"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
@@ -68,15 +124,15 @@ jobs:
         if: "always() && steps.packages_flutter_rx_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/flutter_rx_core
         run: dart test -p chrome
-  job_003:
-    name: "test; macos; Dart dev; `dart test`"
+  job_005:
+    name: "test; macos; Dart dev; PKG: packages/flutter_rx_core; `dart test`"
     runs-on: macos-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:macos-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core;commands:test_1"
+          key: "os:macos-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core;commands:test_2"
           restore-keys: |
             os:macos-latest;pub-cache-hosted;sdk:dev;packages:packages/flutter_rx_core
             os:macos-latest;pub-cache-hosted;sdk:dev
@@ -96,15 +152,15 @@ jobs:
         if: "always() && steps.packages_flutter_rx_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/flutter_rx_core
         run: dart test
-  job_004:
-    name: "test; macos; Dart stable; `dart test`"
+  job_006:
+    name: "test; macos; Dart stable; PKG: packages/flutter_rx_core; `dart test`"
     runs-on: macos-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:macos-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core;commands:test_1"
+          key: "os:macos-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core;commands:test_2"
           restore-keys: |
             os:macos-latest;pub-cache-hosted;sdk:stable;packages:packages/flutter_rx_core
             os:macos-latest;pub-cache-hosted;sdk:stable
@@ -124,8 +180,8 @@ jobs:
         if: "always() && steps.packages_flutter_rx_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/flutter_rx_core
         run: dart test
-  job_005:
-    name: "test; windows; Dart dev; `dart test`"
+  job_007:
+    name: "test; windows; Dart dev; PKG: packages/flutter_rx_core; `dart test`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.3
@@ -142,8 +198,8 @@ jobs:
         if: "always() && steps.packages_flutter_rx_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/flutter_rx_core
         run: dart test
-  job_006:
-    name: "test; windows; Dart stable; `dart test`"
+  job_008:
+    name: "test; windows; Dart stable; PKG: packages/flutter_rx_core; `dart test`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.3

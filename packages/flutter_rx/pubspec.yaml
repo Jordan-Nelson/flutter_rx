@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_rx_core: ^0.1.0
+  rxdart: ^0.27.0
 
 dev_dependencies:
   flutter_lints: ^2.0.1

@@ -1,0 +1,11 @@
+sdk:
+  - stable
+  - beta
+
+stages:
+  - analyze:
+      - group:
+          - format
+          - analyze: --fatal-infos lib test
+  - test:
+      - test:
