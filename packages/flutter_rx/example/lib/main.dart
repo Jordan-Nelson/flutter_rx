@@ -125,7 +125,7 @@ final reducer = createReducer<AppState>([
 ///
 /// Effects can optionally return one or more actions. These actions
 /// will then be dispatched. If the effect returns a list of actions,
-/// will ne dispatched in the order of the list.
+/// will be dispatched in the order of the list.
 ///
 /// Effects should **not** call dispatch to dispatch new actions.
 Effect<AppState> onFetchCounter = (
@@ -197,7 +197,7 @@ class HomePage extends StatelessWidget {
             /// StoreConnector can be used to access data from the store
             /// using a selector.
             ///
-            /// You do not have to use StoreConnect. Data can be streamed from
+            /// You do not have to use StoreConnector. Data can be streamed from the
             /// store using `StoreProvider.of<AppState>(context)`, and the current
             /// snapshot of the store can be read with
             /// `StoreProvider.of<AppState>(context).value`.
