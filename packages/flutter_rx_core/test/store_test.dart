@@ -54,21 +54,21 @@ class FetchCounterValueSuccessAction extends StoreAction {
 }
 
 // reducers
-AppState _incrementCounter(
+AppState incrementCounterReducer(
   AppState state,
   IncrementAction action,
 ) {
   return state.copyWith(counter: state.counter + 1);
 }
 
-AppState _incrementCounterBy(
+AppState incrementCounterByReducer(
   AppState state,
   IncrementByAction action,
 ) {
   return state.copyWith(counter: state.counter + action.value);
 }
 
-AppState _fetchCounterValue(
+AppState fetchCounterValueReducer(
   AppState state,
   FetchCounterValueAction action,
 ) {
@@ -77,7 +77,7 @@ AppState _fetchCounterValue(
   );
 }
 
-AppState _fetchCounterValueSuccess(
+AppState fetchCounterValueSuccessReducer(
   AppState state,
   FetchCounterValueSuccessAction action,
 ) {
@@ -88,10 +88,10 @@ AppState _fetchCounterValueSuccess(
 }
 
 final reducer = createReducer<AppState>([
-  On<AppState, IncrementAction>(_incrementCounter),
-  On<AppState, IncrementByAction>(_incrementCounterBy),
-  On<AppState, FetchCounterValueAction>(_fetchCounterValue),
-  On<AppState, FetchCounterValueSuccessAction>(_fetchCounterValueSuccess),
+  On<AppState, IncrementAction>(incrementCounterReducer),
+  On<AppState, IncrementByAction>(incrementCounterByReducer),
+  On<AppState, FetchCounterValueAction>(fetchCounterValueReducer),
+  On<AppState, FetchCounterValueSuccessAction>(fetchCounterValueSuccessReducer),
 ]);
 
 // effects
@@ -106,7 +106,7 @@ Effect<AppState> onFetchCounter = (
   });
 };
 
-Future<void> waitForActionToPropogate() => Future.delayed(Duration.zero);
+Future<void> waitForActionToPropagate() => Future.delayed(Duration.zero);
 Future<void> waitForAsyncTask() => Future.delayed(Duration(milliseconds: 110));
 
 void main() {
@@ -124,7 +124,7 @@ void main() {
 
       store.dispatch(IncrementAction());
 
-      await waitForActionToPropogate();
+      await waitForActionToPropagate();
 
       expect(store.value, AppState(counter: 1, isLoading: false));
     });
@@ -134,7 +134,7 @@ void main() {
 
       store.dispatch(IncrementByAction(value: 10));
 
-      await waitForActionToPropogate();
+      await waitForActionToPropagate();
 
       expect(store.value, AppState(counter: 10, isLoading: false));
     });
@@ -144,7 +144,7 @@ void main() {
 
       store.dispatch(FetchCounterValueAction());
 
-      await waitForActionToPropogate();
+      await waitForActionToPropagate();
 
       expect(store.value, AppState(counter: 0, isLoading: true));
 
