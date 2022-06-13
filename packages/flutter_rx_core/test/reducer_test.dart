@@ -11,10 +11,9 @@ class IncrementByAction extends StoreAction {
 }
 
 void main() {
-  setUp(() {});
   group('reducer', () {
     test('createReducer', () {
-      int _increment(
+      int increment(
         int value,
         IncrementAction action,
       ) {
@@ -22,7 +21,7 @@ void main() {
       }
 
       final counterReducer = createReducer<int>([
-        On<int, IncrementAction>(_increment),
+        On<int, IncrementAction>(increment),
       ]);
       final action = IncrementAction();
       final initialValue = 0;
@@ -31,7 +30,7 @@ void main() {
     });
 
     test('createReducer - action with state', () {
-      int _incrementBy(
+      int incrementBy(
         int value,
         IncrementByAction action,
       ) {
@@ -39,7 +38,7 @@ void main() {
       }
 
       final counterReducer = createReducer<int>([
-        On<int, IncrementByAction>(_incrementBy),
+        On<int, IncrementByAction>(incrementBy),
       ]);
       final action = IncrementByAction(value: 10);
       final initialValue = 0;
