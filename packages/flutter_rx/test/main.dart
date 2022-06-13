@@ -91,8 +91,6 @@ class AppHome extends StatelessWidget {
   }
 }
 
-Future<void> waitForActionToPropogate() => Future.delayed(Duration.zero);
-
 void main() {
   group('Store', () {
     testWidgets('increment counter', (WidgetTester tester) async {
