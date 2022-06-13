@@ -1,0 +1,22 @@
+github:
+  on:
+    push:
+      branches:
+        - main
+    pull_request:
+
+  workflows:
+    lint:
+      name: Dart Lint
+      stages:
+        - analyze
+    test:
+      name: Test
+      stages:
+        - test
+
+self_validate: analyze
+
+merge_stages:
+  - analyze
+  - test
