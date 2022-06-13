@@ -1,25 +1,3 @@
-# flutter_rx
-
-A redux style state management library, loosely inspired by [NgRx](https://ngrx.io/) as well as [flutter_redux](https://github.com/brianegan/flutter_redux) and [redux](https://github.com/fluttercommunity/redux.dart).
-
-## Key concepts
-
-- **Actions** describe unique events and are typically dispatched from widgets or returned from an [Effect], such as a button click or the intent to load data from a server.
-- State changes are handled by pure functions called **reducers** that take the current state and the latest action to compute a new state.
-- **Selectors** are pure functions used to select, derive, and compose pieces of state.
-- State is accessed with the **Store**, an observable of state and an observer of actions.
-- **Effects** are used to handle any and all side effects, such as loading data from a remote server.
-
-## Diagram
-
-The following diagram represents the overall general flow of application state in flutter_rx.
-![flutter_rx Diagram](./screenshots/Flutter_Rx.png?raw=true)
-
-## Usage
-
-Below is a counter app that uses flutter_rx
-
-```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_rx/flutter_rx.dart';
 import 'package:rxdart/rxdart.dart';
@@ -271,4 +249,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-```
